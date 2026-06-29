@@ -32,6 +32,22 @@ const userSchema = new mongoose.Schema({
     timestamps: true,
 });
 
+userSchema.virtual('books', {
+    ref: 'Book',           // Model to query
+    localField: '_id',     // Author's _id
+    foreignField: 'author' // Book's author field
+})
+
+userSchema.virtual('booksCount', {
+    ref: 'Book',           // Model to query
+    localField: '_id',     // Author's _id
+    foreignField: 'author', // Book's author field
+    count: true            // Only get the number of docs
+})
+
+userSchema.set('toJSON', { virtuals: true });
+userSchema.set('toObject', { virtuals: true });
+
 // Create model from schema
 const UserModel = mongoose.model('User', userSchema);
 

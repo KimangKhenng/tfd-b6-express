@@ -13,7 +13,7 @@ export const createUser = asyncHandler(async (req, res) => {
 })
 
 export const getAllUsers = asyncHandler(async (req, res) => {
-    const users = await UserModel.find({})
+    const users = await UserModel.find({}).populate('books').populate('booksCount')
     res.status(200).json(users)
 })
 
