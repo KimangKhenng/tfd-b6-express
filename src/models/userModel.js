@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 const ageValidator = function (value) {
     return value >= 18 && value <= 100;
@@ -47,6 +48,7 @@ userSchema.virtual('booksCount', {
 
 userSchema.set('toJSON', { virtuals: true });
 userSchema.set('toObject', { virtuals: true });
+userSchema.plugin(mongoosePaginate)
 
 // Create model from schema
 const UserModel = mongoose.model('User', userSchema);

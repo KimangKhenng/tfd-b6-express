@@ -13,15 +13,66 @@ export const createBook = asyncHandler(async (req, res) => {
 })
 
 export const getAllBooks = asyncHandler(async (req, res) => {
-    const books = await BookModel.find({}).populate({
-        path: 'author',
-        select: 'name email age',
-        options: { sort: { name: 1 } }
-    })
-    res.status(200).json({
-        success: true,
-        data: books
-    })
+
+    const {
+        page = 11,
+        limit = 10,
+        publishedYear,
+        minYear,
+        maxYear,
+        search,
+        sort = '-createdAt',
+        populate,
+        select
+    } = req.query
+
+    // const publishedYear = parseInt(req.query.publishedYear)
+
+    const query = {}
+
+    if (req.query.publishedYear) {
+        query.publishedYear = publishedYear
+    }
+
+    // Add range filter for view count
+    if (minYear || maxYear) {
+        query.publishedYear = {};
+        if (minYear) query.publishedYear.$gte = parseInt(minYear);
+        if (maxYear) query.publishedYear.$lte = parseInt(maxYear);
+    }
+
+    if (search) {
+        // Search in title OR isbn
+        query.$text = {
+            '$search': search
+        }
+    }
+
+
+    let popArray = ""
+
+    if (populate) {
+        popArray = populate.replace(",", " ")
+    }
+
+    let selectArray = ""
+
+    if (select) {
+        selectArray = select.replace(",", " ")
+    }
+
+    console.log("Query:", query)
+
+
+    const result = await BookModel.paginate(query, {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        select: selectArray,
+        sort,
+        populate: popArray
+    });
+
+    res.status(200).json(result);
 })
 
 export const getBookById = asyncHandler(async (req, res) => {
